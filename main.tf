@@ -124,13 +124,13 @@ data "template_file" "jenkins_server" {
 
 # the Jenkins server itself
 resource "aws_instance" "jenkins_server" {
-  ami                    		= "${data.aws_ami.jenkins_server.image_id}"
+  ami                       = "${lookup(var.amis,var.aws_region)}"
   instance_type          		= "t3.medium"
-  key_name               		= "${aws_key_pair.jenkins_server.key_name}"
+  key_name                  = "${var.aws_key_name}"
   subnet_id              		= "${data.aws_subnet_ids.default_public.ids[0]}"
   vpc_security_group_ids 		= ["${data.aws_security_group.jenkins_server.id}"]
   iam_instance_profile   		= "dev_jenkins_server"
-  user_data              		= "${data.template_file.jenkins_server.rendered}"
+  user_data                 = "${file("userdata.sh")}"
 
   tags {
     "Name" = "jenkins_server"
